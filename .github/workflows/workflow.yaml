@@ -1,28 +1,55 @@
-name: Trigger Reusable Workflow
+# name: Trigger Reusable Workflow
+
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   prebuild:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@v4
+
+#   call-reusable:
+#     permissions:
+#       contents: read
+#       id-token: write
+#     uses: atitMula/docker-gs-ping/.github/workflows/golang.yaml@main
+
+#     with:
+#       ecr_repo: "golang"
+#       s3_bucket_name:
+#       cloudfront_distribution_id:
+#       main_branch: main
+#       prod_repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang-prod
+#       repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang
+
+#     secrets: inherit
+
+
+
+name: Call Docker Action
 
 on:
   push:
     branches: [main]
 
 jobs:
-  prebuild:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
+      
+      - name: Run Python Test Action
+        uses: atitMula/docker-gs-ping/.github/actions/golang.yaml@main
+        with:
+          ecr_repo: "golang"
+          s3_bucket_name:
+          cloudfront_distribution_id:
+          main_branch: main
+          prod_repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang-prod
+          repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang
 
-  call-reusable:
-    permissions:
-      contents: read
-      id-token: write
-    uses: atitMula/docker-gs-ping/.github/workflows/golang.yaml@main
-
-    with:
-      ecr_repo: "golang"
-      s3_bucket_name:
-      cloudfront_distribution_id:
-      main_branch: main
-      prod_repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang-prod
-      repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang
-
-    secrets: inherit
+        secrets: inherit
