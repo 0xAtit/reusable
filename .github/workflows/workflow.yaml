@@ -16,7 +16,7 @@ jobs:
       s3_bucket_name:
       cloudfront_distribution_id:
       main_branch: main
-      PROD_REPOSITORY_URI: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang-prod
-      REPOSITORY_URI: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang
+      prod_repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang-prod
+      repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang
 
     secrets: inherit
