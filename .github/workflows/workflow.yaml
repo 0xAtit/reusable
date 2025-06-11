@@ -52,4 +52,4 @@ jobs:
           prod_repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang-prod
           repository_uri: 966085404185.dkr.ecr.us-east-1.amazonaws.com/golang
 
-        secrets: inherit
+        # secrets: inherit
