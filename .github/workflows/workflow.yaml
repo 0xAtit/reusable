@@ -2,7 +2,7 @@ name: Trigger Reusable Workflow
 
 on:
   push:
-    branches: [${main_branch}]
+    branches: [main]
 
 jobs:
   call-reusable:
