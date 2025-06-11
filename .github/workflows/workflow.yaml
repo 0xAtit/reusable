@@ -43,7 +43,7 @@ jobs:
       #   uses: actions/checkout@v4
       
       - name: Run Python Test Action
-        uses: atitMula/docker-gs-ping/.github/actions/golang.yaml@main
+        uses: atitMula/docker-gs-ping/.github/actions/golang@main
         with:
           ecr_repo: "golang"
           s3_bucket_name:
