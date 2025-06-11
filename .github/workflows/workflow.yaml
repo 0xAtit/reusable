@@ -5,11 +5,17 @@ on:
     branches: [main]
 
 jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
   call-reusable:
     permissions:
       contents: read
       id-token: write
-    uses: atitMula/docker-gs-ping/.github/workflows/golang-prod.yaml@main
+    uses: atitMula/docker-gs-ping/.github/workflows/golang.yaml@main
 
     with:
       ecr_repo: "golang"
