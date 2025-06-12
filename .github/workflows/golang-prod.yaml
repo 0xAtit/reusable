@@ -71,6 +71,7 @@ jobs:
           # echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_ENV"
         run: |
           git fetch --tags
+          export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
           echo "GITHUB_REF_NAME=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
           echo $GITHUB_REF_NAME
 
