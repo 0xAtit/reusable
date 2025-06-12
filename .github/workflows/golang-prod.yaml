@@ -69,13 +69,17 @@ jobs:
       - name: Extract tag
           # export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
           # echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_ENV"
+          # export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
+          # echo "GITHUB_REF_NAME=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+          # echo $GITHUB_REF_NAME
+        id: extract-tag
         run: |
           git fetch --tags
-          export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
-          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
-          echo $GITHUB_REF_NAME
+          echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_OUTPUT"
 
       - name: Push Docker images to ECR1
+        env:
+          GITHUB_REF_NAME: ${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
         run: |
           echo $GITHUB_REF_NAME
           docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$GITHUB_REF_NAME
