@@ -70,7 +70,7 @@ jobs:
           # export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
         run: |
           git fetch --tags
-          echo "GITHUB_REF_NAME=`$(git describe --tags --abbrev=0 --always)`" >> "$GITHUB_ENV"
+          echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_ENV"
           echo $GITHUB_REF_NAME
 
       - name: Push Docker images to ECR1
