@@ -75,7 +75,9 @@ jobs:
         id: extract-tag
         run: |
           git fetch --tags
-          echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_OUTPUT"
+          export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
+          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          echo $GITHUB_REF_NAME
 
       - name: Push Docker images to ECR1
         env:
