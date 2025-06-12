@@ -84,7 +84,7 @@ jobs:
           ref_name: ${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
         run: |
           echo $ref_name
-          docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$GITHUB_REF_NAME
+          docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
           docker push $REPOSITORY_URI:$GITHUB_REF_NAME
 
       - name: Push Docker images to ECR2
