@@ -41,7 +41,7 @@ jobs:
         run: |
           ls -lah .
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         # run: echo "GITHUB_REF_NAME=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
@@ -62,6 +62,7 @@ jobs:
       - name: Build, tag
         run: |
           IMAGE_TAG=build-${{ github.run_id }}
+          echo $IMAGE_TAG
           docker build --cache-from $REPOSITORY_URI:latest -t $REPOSITORY_URI:latest . --build-arg GITHUB_TOKEN=$GITHUB_TOKEN
           docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
           docker push $REPOSITORY_URI:latest
@@ -70,6 +71,7 @@ jobs:
         run: |
           git fetch --tags
           export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
+          echo $GITHUB_REF_NAME
 
       - name: Push Docker images to ECR1
         run: |
