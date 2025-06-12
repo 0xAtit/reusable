@@ -42,7 +42,9 @@ jobs:
           ls -lah .
       - name: Checkout source
         uses: actions/checkout@v4
-        # run: echo "GITHUB_REF_NAME=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+        run: |
+          echo "GITHUB_REF_NAME=`echo $(git describe --tags --abbrev=0 --always)`" >> $GITHUB_ENV
+          echo $GITHUB_REF_NAME
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -67,11 +69,11 @@ jobs:
           docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
           docker push $REPOSITORY_URI:latest
 
-      - name: Extract tag
-        run: |
-          git fetch --tags
-          export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
-          echo $GITHUB_REF_NAME
+      # - name: Extract tag
+      #   run: |
+      #     git fetch --tags
+      #     export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
+      #     echo $GITHUB_REF_NAME
 
       - name: Push Docker images to ECR1
         run: |
