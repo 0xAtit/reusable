@@ -66,6 +66,8 @@ jobs:
           docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
           docker push $REPOSITORY_URI:latest
 
+          repo_name="${REPOSITORY_URI##*/}"
+          echo "$repo_name"
       - name: Extract tag
           # export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
           # echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_ENV"
@@ -96,3 +98,15 @@ jobs:
           aws-access-key-id: ${{ secrets.TF_VAR_aws_access_key }}
           aws-secret-access-key: ${{ secrets.TF_VAR_aws_secret_key }}
           aws-region: ${{ env.AWS_REGION }}
+
+
+
+# > repo_name="${ecr_url##*/}"
+# echo "$repo_name"
+# golang-prod
+
+
+# aws ecr put-image-tag-mutability --repository-name name --image-tag-mutability MUTABLE --region region
+# docker build -t $ECR_REPO_URL:latest .
+# docker push $ECR_REPO_URL:latest
+# aws ecr put-image-tag-mutability --repository-name name --image-tag-mutability IMMUTABLE --region region
