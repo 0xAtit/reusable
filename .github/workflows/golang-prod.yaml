@@ -64,10 +64,12 @@ jobs:
           echo $IMAGE_TAG
           docker build --cache-from $REPOSITORY_URI:latest -t $REPOSITORY_URI:latest . --build-arg GITHUB_TOKEN=$GITHUB_TOKEN
           docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-          docker push $REPOSITORY_URI:latest
 
           repo_name="${REPOSITORY_URI##*/}"
           echo "$repo_name"
+          aws ecr put-image-tag-mutability --repository-name $repo_name --image-tag-mutability MUTABLE --region $AWS_REGION
+          docker push $REPOSITORY_URI:latest
+          aws ecr put-image-tag-mutability --repository-name $repo_name --image-tag-mutability IMMUTABLE --region $AWS_REGION
       - name: Extract tag
           # export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
           # echo "GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)" >> "$GITHUB_ENV"
