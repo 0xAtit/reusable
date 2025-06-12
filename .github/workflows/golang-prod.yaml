@@ -77,11 +77,13 @@ jobs:
 
       - name: Push Docker images to ECR1
         run: |
+          echo $GITHUB_REF_NAME
           docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$GITHUB_REF_NAME
           docker push $REPOSITORY_URI:$GITHUB_REF_NAME
 
       - name: Push Docker images to ECR2
         run: |
+          echo $GITHUB_REF_NAME
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $PROD_REPOSITORY_URI
           docker tag $REPOSITORY_URI:latest $PROD_REPOSITORY_URI:$GITHUB_REF_NAME
           docker push $PROD_REPOSITORY_URI:$GITHUB_REF_NAME
