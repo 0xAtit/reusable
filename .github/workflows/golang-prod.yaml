@@ -53,7 +53,7 @@ jobs:
       - name: Log in to Amazon ECR
         run: |
           ls -lah .
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+          aws ecr get-login-password --region $AWS_REGION --no-include-email | docker login --username AWS --password-stdin $REPOSITORY_URI
 
       - name: Pull cache image
         run: docker pull $REPOSITORY_URI:latest || true
@@ -75,22 +75,21 @@ jobs:
         id: extract-tag
         run: |
           git fetch --tags
-          export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
-          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
-          echo $GITHUB_REF_NAME
+          echo "git_ref=$(git describe --tags --abbrev=0 --always)" >> "$$GITHUB_ENV"
+          echo $git_ref
 
       - name: Push Docker images to ECR1
-        env:
-          ref_name: ${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
+        # env:
+        #   ref_name: ${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
         run: |
-          echo $ref_name
-          docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
-          docker push $REPOSITORY_URI:${{ steps.extract-tag.outputs.GITHUB_REF_NAME }}
+          echo $git_ref
+          docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$git_ref
+          docker push $REPOSITORY_URI:$git_ref
 
       - name: Push Docker images to ECR2
         run: |
           echo $GITHUB_REF_NAME
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $PROD_REPOSITORY_URI
+          aws ecr get-login-password --region $AWS_REGION --no-include-email | docker login --username AWS --password-stdin $PROD_REPOSITORY_URI
           docker tag $REPOSITORY_URI:latest $PROD_REPOSITORY_URI:$GITHUB_REF_NAME
           docker push $PROD_REPOSITORY_URI:$GITHUB_REF_NAME
         env:
