@@ -1,0 +1,87 @@
+name: Build and Deploy
+
+on:
+  workflow_call:
+    inputs:
+      ecr_repo:
+        required: false
+        type: string
+      s3_bucket_name:
+        required: false
+        type: string
+      cloudfront_distribution_id:
+        required: false
+        type: string
+      main_branch:
+        required: false
+        type: string
+      prod_repository_uri:
+        required: true
+        type: string
+      repository_uri:
+        required: true
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  REPO: your-repo-name
+  PROD_REPOSITORY_URI: ${{ inputs.prod_repository_uri }}
+  REPOSITORY_URI: ${{ inputs.repository_uri }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # packages: write
+      id-token: write
+    steps:
+      - name: Get called workflow reference
+        run: |
+          ls -lah .
+      - name: Checkout source
+        uses: actions/checkout@v2
+        # run: echo "GITHUB_REF_NAME=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        run: |
+          ls -lah .
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+
+      - name: Pull cache image
+        run: docker pull $REPOSITORY_URI:latest || true
+
+      - name: Build, tag
+        run: |
+          IMAGE_TAG=build-${{ github.run_id }}
+          docker build --cache-from $REPOSITORY_URI:latest -t $REPOSITORY_URI:latest . --build-arg GITHUB_TOKEN=$GITHUB_TOKEN
+          docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+          docker push $REPOSITORY_URI:latest
+
+      - name: Extract tag
+        run: |
+          git fetch --tags
+          export GITHUB_REF_NAME=$(git describe --tags --abbrev=0 --always)
+
+      - name: Push Docker images to ECR1
+        run: |
+          docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$GITHUB_REF_NAME
+          docker push $REPOSITORY_URI:$GITHUB_REF_NAME
+
+      - name: Push Docker images to ECR2
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $PROD_REPOSITORY_URI
+          docker tag $REPOSITORY_URI:latest $PROD_REPOSITORY_URI:$GITHUB_REF_NAME
+          docker push $PROD_REPOSITORY_URI:$GITHUB_REF_NAME
+        env:
+          aws-access-key-id: ${{ secrets.TF_VAR_aws_access_key }}
+          aws-secret-access-key: ${{ secrets.TF_VAR_aws_secret_key }}
+          aws-region: ${{ env.AWS_REGION }}
