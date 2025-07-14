@@ -3,9 +3,9 @@ name: Build and Deploy
 on:
   workflow_call:
     inputs:
-      ecr_repo:
-        required: false
-        type: string
+      # ecr_repo:
+      #   required: false
+      #   type: string
       # s3_bucket_name:
       #   required: false
       #   type: string
