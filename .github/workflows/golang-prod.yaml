@@ -21,9 +21,9 @@ on:
       repository_uri:
         required: true
         type: string
-      github_repo:
-        required: true
-        type: string
+      # github_repo:
+      #   required: true
+      #   type: string
 
 env:
   AWS_REGION: us-east-1
