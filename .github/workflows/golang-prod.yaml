@@ -6,12 +6,12 @@ on:
       ecr_repo:
         required: false
         type: string
-      s3_bucket_name:
-        required: false
-        type: string
-      cloudfront_distribution_id:
-        required: false
-        type: string
+      # s3_bucket_name:
+      #   required: false
+      #   type: string
+      # cloudfront_distribution_id:
+      #   required: false
+      #   type: string
       main_branch:
         required: false
         type: string
@@ -21,11 +21,14 @@ on:
       repository_uri:
         required: true
         type: string
+      github_repo:
+        required: true
+        type: string
 
 env:
   AWS_REGION: us-east-1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  REPO: your-repo-name
+  REPO: ${{ inputs.github_repo }}
   PROD_REPOSITORY_URI: ${{ inputs.prod_repository_uri }}
   REPOSITORY_URI: ${{ inputs.repository_uri }}
 
@@ -89,3 +92,17 @@ jobs:
           aws-access-key-id: ${{ secrets.TF_VAR_aws_access_key }}
           aws-secret-access-key: ${{ secrets.TF_VAR_aws_secret_key }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update manifests in workstate
+        run: |
+          git clone https://bludot:${GITHUB_TOKEN}@github.com/TempMee/workstate.git workstate
+          cd workstate
+          find . -type f -name '*.yaml' -print0 | xargs -0 sed -E -i 's/(tag:[[:space:]]).*( # '"$REPO"')/\1'"$git_ref"'\2/'
+          git config --global user.email "noreply@tempmee.com"
+          git config --global user.name "tempmee-release-bot"
+          git add .
+          git commit -m "feat(${REPO}): $git_ref"
+          git push origin development
+          git checkout eks-new-cluster
+          git rebase development
+          git push origin eks-new-cluster -f
