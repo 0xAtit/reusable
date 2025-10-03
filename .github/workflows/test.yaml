@@ -1,0 +1,19 @@
+name: Build & Push Image to Amazon ECR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Datadog CI
+        run: npm install -g @datadog/datadog-ci
+
